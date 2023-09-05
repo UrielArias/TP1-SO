@@ -19,5 +19,17 @@ int main (int argc, char * argv []) {
         fprintf(stderr, "Directory %s is not valid\n", argv[1]);
         exit(EXIT_FAILURE);
     }
+
+    readdir(dir);
+    readdir(dir);
+    struct dirent * dp; 
+    
+    // 1º creamos los slaves
+    // 2º abrimos el dir?
+    while ( (dp = readdir(dir)) != NULL ){
+        //dp->d_name;
+    }
+
+    closedir(dir);
 }
 

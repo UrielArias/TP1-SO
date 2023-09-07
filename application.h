@@ -22,3 +22,5 @@ typedef struct process{
     int readFrom;
     int sendTo;
 } process;
+
+void createSlaves(int numSlaves, process* slaveList, char ** files, int workload);

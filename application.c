@@ -38,7 +38,7 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
             perror("pipe creation unsuccesful");
             exit(1);
         }
-        returnValue = pipe(pipeFds[READRESULTPIPE]);
+        returnValue = pipe(&pipeFds[READRESULTPIPE]);
         
         fdsToClose[index++] = pipeFds[WRITEFILEPIPE];
         fdsToClose[index++] = pipeFds[READRESULTPIPE];
@@ -54,7 +54,8 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
             dup(pipeFds[READFILEPIPE]);
             dup(pipeFds[WRITERESULTPIPE]);
             for (int arg = 1; arg <= workload; arg++){
-                argvFork[arg] = files++;
+                argvFork[arg] = *files;
+                files++;
             }
             argvFork[workload + 1] = NULL;
             execve("./slave", argvFork, envpFork);

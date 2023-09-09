@@ -8,15 +8,6 @@
 
 #define SIZE_MD5 16
 
-/**
- ** Para calcular md5
- *  unsigned char *MD5(const unsigned char *d, unsigned long n, unsigned char *md);
- * @brief 
- *  d = nombre file
- *  n = # bytes a leer
- *  md = donde se guarda el resultado
- */
-
 
  int main(){
     char * name_file;
@@ -31,29 +22,22 @@
     // pr ver si se puede lograr d otra manera + efi
     // el = resultado  
     
-    struct stat data; 
+    char * fmt;
 
     // TODO: frena con el \n?
     // idea: separo nombre de files con \n 
+    // 
+
     while ( scanf("%s",name_file) ){
-
-        // vale la pena syscall x cada file?
-        stat(name_file, &data);
-        //if ( errno==EIO )
-        //    exit(1);
-
+        // formato: ""
+        // fmt = sscanf("md5 path/")
+        // popen("md5sum")
         // TODO
-        // man dice q retorna el hash
-        // pero creo q tmb lo guarda si pasas como param
-        // si ese param ==null => guarda cm var statica
-        // es otra cosa? hay q sacar
-        // md5 = 
-        MD5(name_file,data.st_size, md5 );
-
-        // TODO
-        // ver q hay q enviarle 
+        /*  Lo hacemos desde app
+        modularizamos + evitamos syscall 
         printf("%d", getpid());
-        printf("%s",md5);
+        */
+        printf("%s \n ",md5);
     }
 
     free(md5);

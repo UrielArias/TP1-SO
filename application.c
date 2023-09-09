@@ -40,8 +40,8 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
             exit(1);
         }
         returnValue = pipe(&pipeFds[READRESULTPIPE]);
-        
-        fdsToClose[index++] = pipeFds[READRESULTPIPE];
+
+        fdsToClose[index++] = pipeFds[READRESULTPIPE]; 
         
         pid = fork();
 

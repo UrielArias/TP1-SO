@@ -86,7 +86,7 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves){
         //TODO: write to buffer
         for (int slave = 0; activeFd> 0 && slave < numSlaves; slave++){
             //if
-            if (FD_ISSET(slaves[slave].readFrom)){
+            if (FD_ISSET(slaves[slave].readFrom, &set)){
                 //tera
             }
         }
@@ -95,13 +95,13 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves){
 }
 
 int setFdsToCheck(process* slaves, int numSlaves, fd_set * set){
-    FD_ZERO(fd_set); //first step to clear set
+    FD_ZERO(set); //first step to clear set
     int fd;
     int maxFd = -1; //in case there are no slaves left working it returns -1
     for (int slave = 0; slave < numSlaves; slave++){
         if (slaves[slave].isExecuting){
             fd = slaves[slave].readFrom;
-            FD_SET(fd, fd_set);
+            FD_SET(fd, set);
             maxFd = (fd > maxFd)? fd : maxFd;
         }
     }

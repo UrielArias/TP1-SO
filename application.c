@@ -34,6 +34,7 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
     
     for (int slave = 0, index = 0; slave < numSlaves; slave++){
         returnValue = pipe(pipeFds);
+        fdsToClose[index++] = pipeFds[WRITEFILEPIPE];
         if (returnValue == -1){
             perror("pipe creation unsuccesful");
             exit(1);

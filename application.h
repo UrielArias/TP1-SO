@@ -16,11 +16,12 @@
 #define READRESULTPIPE 2
 #define WRITERESULTPIPE 3
 
-
 typedef struct process{
     int pid;
     int readFrom;
     int sendTo;
+    int isExecuting;
 } process;
 
 void createSlaves(int numSlaves, process* slaveList, char ** files, int workload);
+void monitorSlaves(process* slaves, int remainingFiles, int numSlaves);

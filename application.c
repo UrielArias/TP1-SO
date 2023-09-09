@@ -40,7 +40,6 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
         }
         returnValue = pipe(&pipeFds[READRESULTPIPE]);
         
-        fdsToClose[index++] = pipeFds[WRITEFILEPIPE];
         fdsToClose[index++] = pipeFds[READRESULTPIPE];
         
         pid = fork();
@@ -69,3 +68,42 @@ void createSlaves(int numSlaves, process* slaveList, char ** files, int workload
         }
     }
 }
+
+void monitorSlaves(process* slaves, int remainingFiles, int numSlaves){
+    fd_set set;
+    int filesDone = 0;
+    int maxfd, activeFd;
+    while (filesDone <= remainingFiles){
+       //select needs the first argument to be the number of the greatest fds to check-> we want to check only the ones who are still are working
+       //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+        maxfd = setFdsToCheck(slaves, numSlaves, &set);
+        activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
+        if (activeFd == -1){
+            perror("Select has failed");
+            exit(1);
+        }
+        //TODO: write to buffer
+        for (int slave = 0; activeFd> 0 && slave < numSlaves; slave++){
+            //if
+            if (FD_ISSET(slaves[slave].readFrom)){
+                //tera
+            }
+        }
+    }
+
+}
+
+int setFdsToCheck(process* slaves, int numSlaves, fd_set * set){
+    FD_ZERO(fd_set); //first step to clear set
+    int fd;
+    int maxFd = -1; //in case there are no slaves left working it returns -1
+    for (int slave = 0; slave < numSlaves; slave++){
+        if (slaves[slave].isExecuting){
+            fd = slaves[slave].readFrom;
+            FD_SET(fd, fd_set);
+            maxFd = (fd > maxFd)? fd : maxFd;
+        }
+    }
+    return maxFd;
+}
+

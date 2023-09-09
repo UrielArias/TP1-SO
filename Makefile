@@ -1,9 +1,10 @@
 CC= gcc
 CFLAGS= -std=c99 -Wall -pedantic -fsanitize=address
+EXEC = 
 all: application slave view
 
 application: application.c
-	$(CC) $(CFLAGS) -o md5 application.c 
+	$(CC) $(CFLAGS) -o app application.c 
 
 slave: slave.c
 	$(CC) $(CFLAGS) -o slave slave.c 
@@ -17,6 +18,7 @@ test:
 	pvs-studio-analyzer trace -- make
 	pvs-studio-analyzer analyze
 	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks PVS-Studio.log
+	valgrind --leak-check=full ./app
 
 cleanAll: cleanView cleanApplication cleanSlave
 cleanView:

@@ -1,45 +1,35 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include <openssl/md5.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <sys/types.h>
-
-#define SIZE_MD5 16
-
+#include "slave.h"
 
  int main(){
-    char * name_file;
-    char * md5 = malloc(SIZE_MD5); 
-    
-    // y si aplication les pasa el path del dir
-    // q contiene los files al principio?
-    // => me pasa solo los nom d los files => + liviano
-    // y desd cda slave los concat?
-    // o termina siendo menos efi?
-    // concat parece costoso, pero digo como idea
-    // pr ver si se puede lograr d otra manera + efi
-    // el = resultado  
-    
-    char * fmt;
 
-    // TODO: frena con el \n?
-    // idea: separo nombre de files con \n 
-    // 
+    char * path = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
 
-    while ( scanf("%s",name_file) ){
-        // formato: ""
-        // fmt = sscanf("md5 path/")
-        // popen("md5sum")
-        // TODO
-        /*  Lo hacemos desde app
-        modularizamos + evitamos syscall 
-        printf("%d", getpid());
-        */
-        printf("%s \n ",md5);
+    // Si se pasan 2 paths (esto podria pasar la primera vez que se usa el slave), 
+    // deberian pasarse los paths uno abajo del otro por stdout 
+    // De esta forma: "path1/npath2 "
+    // Si se pasa solo un path deberia mandarse de esta forma: "path " 
+    while ((linelen = getline(&path, &linecap, stdin)) > 0) {
+        path[linelen-1] = '\0';
+        char command[50];
+        sprintf(command, "md5sum %s", path);
+        FILE * fp = popen(command, "r");
+
+        if (fp == NULL) {
+            fprintf(stderr, "There has been a problem making the md5 on file %s: %s\n", path, strerror(errno));
+        }
+        else {
+            // Obtengo los primeros 32 caracteres, es decir, el hash, 
+            // hay que hacer esto porque el md5 devuelve el hash + el nombre del archivo
+            char hash_md5[HASH_LENGTH];
+            fgets(hash_md5, HASH_LENGTH, fp);
+            printf("File name: %s \nMd5: %s \nSlave's pid: %d \n", path, hash_md5, getpid());
+        }
+        pclose(fp);
     }
-
-    free(md5);
-
+    free(path);
  }

@@ -24,8 +24,10 @@ int main (int argc, char * argv []) {
 
 
     createSlaves(numSlaves, slaves);    
-    sendInitialLoad(slaves, remainingFiles, argv, filesPerSlave);
-    monitorSlaves(slaves, remainingFiles, numSlaves, argv, result);
+    write(slaves[0].sendTo, "./result.txt", 5);
+    sendInitialLoad(slaves, numSlaves, ++argv, filesPerSlave);
+    remainingFiles -= numSlaves * filesPerSlave;
+    monitorSlaves(slaves, remainingFiles, numSlaves, argv+ numSlaves * filesPerSlave, result);
     fclose(result);
 }
 
@@ -55,7 +57,7 @@ void createSlaves(int numSlaves, process* slaveList){
 
         if (pid == 0){
             close(STDIN);
-            close(STDOUT);
+            //close(STDOUT);
             for(int i = 0; i < index; i++){
                 close(fdsToClose[i]);
             }
@@ -76,6 +78,7 @@ void createSlaves(int numSlaves, process* slaveList){
     }
 }
 
+//to check
 int sendInitialLoad(process* slaves, int numSlaves, char ** files, int workload){
     int ret;
     for (int slave = 0; slave < numSlaves; slave++){
@@ -95,6 +98,7 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
        //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
         maxfd = setFdsToCheck(slaves, numSlaves, &set);
         activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
+        printf("%d\n", activeFd);
         if (activeFd == -1){
             perror("Select has failed");
             exit(1);
@@ -120,17 +124,18 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
         }
     }
 }
-
+//to check
 static int sendFilesToSlave(process* slave, int numFiles, char** files){
     if (numFiles <= 0 || files == NULL){
         perror("An array of strings should be passed and it should be specified the amount to be passed");
         exit(1);
     }
     int result;
-    for (int indexFile = 0; indexFile < numFiles; indexFile++, files++){
-        char * file = strcat(*files, " ");
-        result = write(slave->sendTo, file, strlen(*files));
+    for (int indexFile = 0, i = 0; indexFile < numFiles; indexFile++){
+        result = write(slave->sendTo, *files, strlen(*files));
+        printf("%s\n", files[i++]);
     }
+    slave->remainingTasks = numFiles;
     return result;
 }
 

@@ -8,7 +8,6 @@
     fchmod() => para cambiar permisos
 */
 
-// static para q sea privada, bien?
 static int mapMem( sharedMem * shm, int prot, int fd){
     
     shm->virtualAdress = mmap(shm->name, SIZE_SHM, prot , MAP_SHARED, fd, 0 );
@@ -29,25 +28,24 @@ static int mapMem( sharedMem * shm, int prot, int fd){
 int createShm( sharedMem * shm, char * name){
     if ( name == NULL || name[0]!='/' ){
         perror("Invalid shm name");
-        return EXIT_FAILURE; //, it should start with '/'
+        return EXIT_FAILURE; 
     }
 
     // crea o ABRE
-    // t dev el lowest fd
     // O_EXCL asi si ya existe una con = nombre, no se crea
-    int fd = shm_open( name,O_CREAT | O_EXCL | O_WRONLY,0600);
+    int fd = shm_open( name,O_CREAT | O_RDWR | O_EXCL , 0666);
     if ( fd==-1) {             
         perror("shm couldnt be created");
         return EXIT_FAILURE;
     }
-    shm->name = name;    
+    shm->name = name;    //no esta copiando el nombre?
 
     // set size 
     int returnValue;
     returnValue = ftruncate(fd,SIZE_SHM);
-    if ( fd==-1) {             
+    if ( returnValue==-1) {             
         perror("shm size unavailable"); //! raro
-        return EXIT_FAILURE;
+        return returnValue;
     }
 
     // la mapea en el virtual adress space del PROCESO Q LA LLAMO
@@ -55,19 +53,15 @@ int createShm( sharedMem * shm, char * name){
     if ( returnValue == EXIT_FAILURE)
         return returnValue;
 
-    shm->readsAvailable = sem_open(name,O_CREAT | O_EXCL | O_RDWR, 0600,0);
+    shm->readsAvailable = sem_open(name,O_CREAT | O_EXCL | O_RDWR, 0666,0);
     if ( shm->readsAvailable == SEM_FAILED){
         perror("Could not create semaphore");
         return EXIT_FAILURE;
     }
-    // ret 0 pues salio todo bien
 }
 
 /// @brief * shm = DIRECC DONDE METO INFO D LA NUEVA SHM
 /// => app.c no la invoca
-//* FLAGS PARA Q INDI SI R, W o EX??????
-// pondria como arg: int post, pero cli deb usar biblio
-// #include <fcntl.h>
 int openShm( sharedMem * shm, char * name ){      
     if ( name==NULL){
         perror("Invalid shm name");
@@ -76,7 +70,7 @@ int openShm( sharedMem * shm, char * name ){
 
     shm->name = name;    
     
-    int fd = shm_open(name,O_RDONLY, 0600);
+    int fd = shm_open(name,O_RDONLY, 0666);
     if ( fd == -1){
         perror("shm couldnt be opened");
         return EXIT_FAILURE;
@@ -89,7 +83,7 @@ int openShm( sharedMem * shm, char * name ){
     
     shm->readsAvailable = sem_open(name,O_RDWR);
     if ( shm->readsAvailable == SEM_FAILED){
-    perror("Could not open semaphore");
+        perror("Could not open semaphore, chau chau adios");
         return EXIT_FAILURE;
     }
 }
@@ -99,17 +93,13 @@ int openShm( sharedMem * shm, char * name ){
 int deleteShm( sharedMem * shm){
     int returnValue;
     
-    // removes the named semaphore referred to by name.  
-    // The semaphore name is removed immediately
-
     returnValue = shm_unlink( shm->name);
     if ( returnValue == EXIT_FAILURE)
         return returnValue;
 
-    
-    // cuando ya todos terminaron de usarlo
-    // lo SACA DEL SISTEMA
     returnValue = sem_unlink(shm->name);
+    if ( returnValue == EXIT_FAILURE)
+        return returnValue;
 }
  
 int closeShm( sharedMem * shm){
@@ -119,7 +109,6 @@ int closeShm( sharedMem * shm){
     if ( returnValue == EXIT_FAILURE)
         return returnValue;
 
-    //* cuando ya no lo voy a usar +
     returnValue = sem_close( shm->readsAvailable);
     if ( returnValue == EXIT_FAILURE)
         return returnValue;

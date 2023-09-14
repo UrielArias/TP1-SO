@@ -1,56 +1,60 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#include "sharedMemTAD.h"
-#include <stdlib.h>
+#include "communicationAppView.h"
 
-int main(){
-    char * name = "/shm";
-    sharedMem shm;
-    int returnValue;
+//! falta poner en main de app
+// incluir el define NAME_SHM
+//      conviene ponerlo fuera dl TAD, + prolijo
+// escribe  - una x si ya termino sleep(2)
+//          - una z para indicar fin
+//              hay q darle un tiempito a view para q lea
+//              antes de deleteShm() en app
 
-    printf("la voy a crear\n");
+sharedMem shm;
 
-shm_unlink(name);
-    returnValue= createShm(&shm, name);
+int main(int argc, char * argv []){
+
+    char * nameShm = NAME_SHM;
+    int returnValue; 
+    
+    returnValue= openShm(&shm, nameShm);
     if ( returnValue == EXIT_FAILURE) {             
-        perror("shm couldnt be created");
+        perror("communication couldnt be established, make sure app was initiated");
         exit(1);
     }
     
-sleep(10);
-    returnValue = writeShm(&shm,"Hola soy juan \n");
-    if ( returnValue == EXIT_FAILURE) {             
-        perror("shm couldnt be written");
+    // puede acceder? 
+    if ( *shm.virtualAdress=='x'){
+        perror("Buffer cant be accessed, its too late");
         exit(1);
     }
 
-    printf("Se mando el mnsj 1\n");
- 
-    returnValue = writeShm(&shm,"POR LAS NOCHES SOY JUANA \n");
-    if ( returnValue == EXIT_FAILURE) {             
-        perror("shm couldnt be written");
-        exit(1);
+    char message[MSG_SIZE];
+    //leo la x
+    returnValue = readShm(&shm,message,2);
+        if ( returnValue == EXIT_FAILURE) {             
+            perror("shm couldnt be read");
+            closeShm(&shm);
+            exit(1);
+        }
+
+    while(message[0]!='F'){
+        returnValue = readShm(&shm,message,MSG_SIZE);
+        if ( returnValue == EXIT_FAILURE) {             
+            perror("shm couldnt be read");
+            closeShm(&shm);
+            exit(1);
+        }
+        
+        printf("%s\n",message);
+        
     }
-
-    printf("Se mando el mnsj 2\n");
-
-sleep(10);
-    returnValue = writeShm(&shm,"tambien me llaman como juanita \n");
-  
-    printf("Se mando el mnsj 3\n");
-    // buena practica q x sep 
-    printf("la voy a cerrar a JUAN\n");
-   // returnValue = closeShm(&shm);
+            
+    returnValue = closeShm(&shm);
     if ( returnValue == EXIT_FAILURE) {             
         perror("shm couldnt be closed");
         exit(1);
     }
 
-    printf("la voy a cerrar\n");
-    returnValue = deleteShm(&shm);
-    if ( returnValue == EXIT_FAILURE) {             
-        perror("shm couldnt be deleted");
-        exit(1);
-    }
-       
+  
 }

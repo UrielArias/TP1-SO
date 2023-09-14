@@ -1,17 +1,21 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "application.h"
-
+ 
 static int setFdsToCheck(process* slaves, int numSlaves, fd_set * set);
 static int sendFilesToSlave(process* slave, int numFiles, char** files);
 static int setFdsToCheck(process* slaves, int numSlaves, fd_set * set);
 
+sharedMem shm;
 
 int main (int argc, char * argv []) {
     if (argc < 2) {
         fprintf(stderr, "No arguments passed. A path to the files is needed\n");
-        exit(EXIT_FAILURE);
+        exit(1);
     }
+    
+    connectWithView(&shm);
+/*
     int remainingFiles = argc - 1;    
     int numSlaves = (remainingFiles < 5) ? remainingFiles : MAXSLAVE;
     int filesPerSlave = (remainingFiles <= numSlaves || remainingFiles <= MAXFILESPERSLAVE * MAXSLAVE)? 1 : MAXFILESPERSLAVE;
@@ -24,11 +28,14 @@ int main (int argc, char * argv []) {
 
 
     createSlaves(numSlaves, slaves);    
-    write(slaves[0].sendTo, "./result.txt", 5);
     sendInitialLoad(slaves, numSlaves, ++argv, filesPerSlave);
     remainingFiles -= numSlaves * filesPerSlave;
     monitorSlaves(slaves, remainingFiles, numSlaves, argv+ numSlaves * filesPerSlave, result);
     fclose(result);
+    */
+    
+    desconnectShm(&shm);
+    
 }
 
 void createSlaves(int numSlaves, process* slaveList){
@@ -120,6 +127,7 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
                 }
                 //write to Shm se tiene que crear desde la app para tener el tad
                 fwrite(buf, sizeof(buf), 1, resultFile);
+                writeToShm(&shm,buf);
             }
         }
     }
@@ -152,4 +160,3 @@ static int setFdsToCheck(process* slaves, int numSlaves, fd_set * set){
     }
     return maxFd;
 }
-

@@ -5,7 +5,7 @@
 #include <sys/select.h>
 #include <sys/types.h>
 #include <string.h>
-#include "sharedMemTAD.h"
+#include "communicationWithView.h"
 
 #define MAXSLAVE 5
 #define FDSPERPIPE 2
@@ -33,3 +33,4 @@ typedef struct process{
 void createSlaves(int numSlaves, process* slaveList);
 void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * argv [], FILE * resultFile);
 int sendInitialLoad(process* slaves, int numSlaves, char ** files, int workload);
+void connectWithView();

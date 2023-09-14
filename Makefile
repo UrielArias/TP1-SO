@@ -1,16 +1,16 @@
 CC= gcc
-CFLAGS= -std=c99 -Wall -pedantic -fsanitize=address
+CFLAGS= -std=c99 -Wall -pedantic 
 EXEC = 
 all: application slave view
 
 application: application.c
-	$(CC) $(CFLAGS) -o app application.c 
+	$(CC) $(CFLAGS) -o app sharedMemTAD.c communicationWithView.c application.c 
 
 slave: slave.c
 	$(CC) $(CFLAGS) -o slave slave.c 
 
 view: view.c
-	$(CC) $(CFLAGS) -o view view.c 
+	$(CC) $(CFLAGS) -o view sharedMemTAD.c view.c
 
 test: 
 	make all
@@ -24,6 +24,6 @@ cleanAll: cleanView cleanApplication cleanSlave
 cleanView:
 	rm -f view
 cleanApplication:
-	rm -f md5
+	rm -f md5 app
 cleanSlave:
 	rm -f slave

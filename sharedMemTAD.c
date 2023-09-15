@@ -31,16 +31,13 @@ int createShm( sharedMem * shm, char * name){
         return EXIT_FAILURE; 
     }
 
-    // crea o ABRE
-    // O_EXCL asi si ya existe una con = nombre, no se crea
     int fd = shm_open( name,O_CREAT | O_RDWR | O_EXCL , 0666);
     if ( fd==-1) {             
         perror("shm couldnt be created");
         return EXIT_FAILURE;
     }
-    shm->name = name;    //no esta copiando el nombre?
+    shm->name = name;   
 
-    // set size 
     int returnValue;
     returnValue = ftruncate(fd,SIZE_SHM);
     if ( returnValue==-1) {             
@@ -48,7 +45,6 @@ int createShm( sharedMem * shm, char * name){
         return returnValue;
     }
 
-    // la mapea en el virtual adress space del PROCESO Q LA LLAMO
     returnValue = mapMem(shm, PROT_READ | PROT_WRITE, fd);    
     if ( returnValue == EXIT_FAILURE)
         return returnValue;
@@ -60,8 +56,6 @@ int createShm( sharedMem * shm, char * name){
     }
 }
 
-/// @brief * shm = DIRECC DONDE METO INFO D LA NUEVA SHM
-/// => app.c no la invoca
 int openShm( sharedMem * shm, char * name ){      
     if ( name==NULL){
         perror("Invalid shm name");
@@ -83,13 +77,13 @@ int openShm( sharedMem * shm, char * name ){
     
     shm->readsAvailable = sem_open(name,O_RDWR);
     if ( shm->readsAvailable == SEM_FAILED){
-        perror("Could not open semaphore, chau chau adios");
+        perror("Could not open semaphore");
+        munmap(name,SIZE_SHM);
         return EXIT_FAILURE;
     }
 }
 
 
-// la debe elim el proceso vista
 int deleteShm( sharedMem * shm){
     int returnValue;
     
@@ -116,7 +110,6 @@ int closeShm( sharedMem * shm){
 }
 
 // message es donde voy a meter lo leido
-// GUARDA mensaje SIN \n 
 // copia hasta size => evito pasarme dl espacio message
 int readShm(sharedMem * shm, char * message, int size){
     if ( message==NULL ){
@@ -124,10 +117,10 @@ int readShm(sharedMem * shm, char * message, int size){
         return EXIT_FAILURE; 
     }
    
-    //hay para leer
+    // veo si hay para leer
     sem_wait(shm->readsAvailable);
     
-    //RESERVO LUGAR PARA 0 FINAL
+    // reservo lugar para 0 final
    size--;
 
     int i;
@@ -137,11 +130,9 @@ int readShm(sharedMem * shm, char * message, int size){
 
     message[i] = 0;
     shm->offset++;
-    //shm->offset++;
 }
 
 int writeShm(sharedMem * shm, char * message){
-    // check si offset se pasa de SIZE_SHM?
     /* TP: "lugar se puede crear un buffer suficientemente 
     grande para guardar tods lo resultados."
     */
@@ -150,11 +141,10 @@ int writeShm(sharedMem * shm, char * message){
         shm->virtualAdress[shm->offset++] = message[i];
     }                      
 
-    //mete el cero 
+    // mete el cero 
     // ++ asi no pisa desp el 0
     shm->virtualAdress[shm->offset++] = message[i];
     
-
     sem_post(shm->readsAvailable);
 }
 

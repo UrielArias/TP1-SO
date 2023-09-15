@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <sys/mman.h>
-#include <fcntl.h>           /* For O_* constants */
+#include <fcntl.h>   
 #include <semaphore.h>
 #include <unistd.h>
 
@@ -10,8 +10,8 @@
 #define INVALID_ARGS "Invalid arguments"
 
 typedef struct shm {
-    char * name;    // = "/shmName", NULL terminated string
-    int offset;     // ya se inicializa con = 0 no?
+    char * name;    
+    int offset;     
     char * virtualAdress; 
     sem_t * readsAvailable;
 } sharedMem;

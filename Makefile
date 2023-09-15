@@ -1,10 +1,10 @@
 CC= gcc
 CFLAGS= -std=c99 -Wall -pedantic 
 EXEC = 
-all: application slave view
+all: md5 slave view
 
-application: application.c
-	$(CC) $(CFLAGS) -o app sharedMemTAD.c communicationWithView.c application.c 
+md5: application.c
+	$(CC) $(CFLAGS) -o md5 sharedMemTAD.c communicationWithView.c application.c 
 
 slave: slave.c
 	$(CC) $(CFLAGS) -o slave slave.c 
@@ -18,12 +18,12 @@ test:
 	pvs-studio-analyzer trace -- make
 	pvs-studio-analyzer analyze
 	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks PVS-Studio.log
-	valgrind --leak-check=full ./app
+	valgrind --leak-check=full ./md5
 
 cleanAll: cleanView cleanApplication cleanSlave
 cleanView:
 	rm -f view
 cleanApplication:
-	rm -f md5 app
+	rm -f md5 
 cleanSlave:
 	rm -f slave

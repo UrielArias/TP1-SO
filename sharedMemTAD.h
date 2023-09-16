@@ -22,7 +22,7 @@ int openShm( sharedMem * shm, char * name );
 int createShm( sharedMem * shm, char * name);
 int closeShm( sharedMem * shm);
 int readShm(sharedMem * shm, char * message, int size);
-int writeShm(sharedMem * shm, char * message);
+int writeShm(sharedMem * shm, const char * message);
 
 /* contrato:
     + solo puede escribir el proceso q creó la shm

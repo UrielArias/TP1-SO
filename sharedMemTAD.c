@@ -147,7 +147,7 @@ int readShm(sharedMem * shm, char * message, int size){
     return 0;
 }
 
-int writeShm(sharedMem * shm, char * message){
+int writeShm(sharedMem * shm, const char * message){
     if ( shm == NULL || message==NULL ){
         perror(INVALID_ARGS);
         return EXIT_FAIL; 

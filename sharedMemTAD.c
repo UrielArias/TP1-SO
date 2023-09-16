@@ -5,7 +5,7 @@
 
 static int mapMem( sharedMem * shm, int prot, int fd){
     
-    shm->virtualAdress = mmap(shm->name, SIZE_SHM, prot , MAP_SHARED, fd, 0 );
+    shm->virtualAdress = mmap(NULL, SIZE_SHM, prot , MAP_SHARED, fd, 0 );
     if ( shm->virtualAdress == MAP_FAILED){
         perror("shm couldnt be adressed");
         return EXIT_FAIL;
@@ -24,7 +24,7 @@ int createShm( sharedMem * shm, char * name){
     }
 
     int fd = shm_open( name,O_CREAT | O_RDWR | O_EXCL , 0666);
-    if ( fd==-1) {             
+    if ( fd==EXIT_FAIL) {             
         perror("shm couldnt be created");
         return EXIT_FAIL;
     }
@@ -74,7 +74,7 @@ int openShm( sharedMem * shm, char * name ){
         perror("Could not open semaphore");
         munmap(name,SIZE_SHM);
         return EXIT_FAIL;
-    }
+     }
 
     return 0;
 }

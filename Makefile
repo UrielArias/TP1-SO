@@ -1,10 +1,9 @@
 CC= gcc
 CFLAGS= -Wall -pedantic 
-EXEC = 
 all: md5 slave view
 
 md5: application.c
-	$(CC) $(CFLAGS) -o md5 sharedMemTAD.c communicationWithView.c application.c 
+	$(CC) $(CFLAGS) -o md5 sharedMemTAD.c communicationWithView.c communicationWithSlaves.c application.c 
 
 slave: slave.c
 	$(CC) $(CFLAGS) -o slave slave.c 

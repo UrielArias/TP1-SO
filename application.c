@@ -13,12 +13,10 @@ int main (int argc, char * argv []) {
         fprintf(stderr, "No arguments passed. A path to the files is needed\n");
         exit(1);
     }
-    
     connectWithView(&shm);
-/*
     int remainingFiles = argc - 1;    
-    int numSlaves = (remainingFiles < 5) ? remainingFiles : MAXSLAVE;
-    int filesPerSlave = (remainingFiles <= numSlaves || remainingFiles <= MAXFILESPERSLAVE * MAXSLAVE)? 1 : MAXFILESPERSLAVE;
+    int numSlaves = (remainingFiles < MAXSLAVE) ? remainingFiles : MAXSLAVE;
+    int filesPerSlave = (remainingFiles <= numSlaves || remainingFiles < MAXFILESPERSLAVE * MAXSLAVE)? MINFILESPERSLAVE : MAXFILESPERSLAVE;
     FILE * result;
     if( (result = fopen("result.txt", "w")) == NULL ) {
         fprintf(stderr, "Fopen failed");
@@ -26,14 +24,11 @@ int main (int argc, char * argv []) {
     //code;
     process slaves[numSlaves];
 
-
     createSlaves(numSlaves, slaves);    
     sendInitialLoad(slaves, numSlaves, ++argv, filesPerSlave);
     remainingFiles -= numSlaves * filesPerSlave;
     monitorSlaves(slaves, remainingFiles, numSlaves, argv+ numSlaves * filesPerSlave, result);
     fclose(result);
-    */
-    
     desconnectShm(&shm);
     
 }
@@ -57,14 +52,12 @@ void createSlaves(int numSlaves, process* slaveList){
             exit(1);
         }
         returnValue = pipe(&pipeFds[READRESULTPIPE]);
-
         fdsToClose[index++] = pipeFds[READRESULTPIPE]; 
-
         pid = fork();
 
         if (pid == 0){
             close(STDIN);
-            //close(STDOUT);
+            close(STDOUT);
             for(int i = 0; i < index; i++){
                 close(fdsToClose[i]);
             }
@@ -89,7 +82,7 @@ void createSlaves(int numSlaves, process* slaveList){
 int sendInitialLoad(process* slaves, int numSlaves, char ** files, int workload){
     int ret;
     for (int slave = 0; slave < numSlaves; slave++){
-        ret = sendFilesToSlave(&slaves[slave], workload, files);
+        ret = sendFilesToSlave(&slaves[slave], workload, &files[slave * workload]);
     } 
     return ret;
 }
@@ -105,7 +98,6 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
        //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
         maxfd = setFdsToCheck(slaves, numSlaves, &set);
         activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
-        printf("%d\n", activeFd);
         if (activeFd == -1){
             perror("Select has failed");
             exit(1);
@@ -115,19 +107,21 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
             //if
             if (FD_ISSET(slaves[slave].readFrom, &set)){
                 read(slaves[slave].readFrom, buf, 160);
+                char * token = "\n";
+                char * toWrite = strtok(buf, token);
                 slaves[slave].remainingTasks--;
                 filesDone++;
+                fwrite(toWrite, strlen(toWrite), 1, resultFile);
+                fwrite(token, strlen(token), 1, resultFile);
+                writeToShm(&shm, toWrite);
                 if (!slaves[slave].remainingTasks && filesToAssigned > 0){
-                    sendFilesToSlave(&slaves[slave], 1, argv);
+                    sendFilesToSlave(&slaves[slave], MINFILESPERSLAVE, argv);
                     filesToAssigned--;
                 }
                 else if (!slaves[slave].remainingTasks){
                     slaves[slave].isOperative = FALSE;
                     //close fd? pipe no longer needed
                 }
-                //write to Shm se tiene que crear desde la app para tener el tad
-                fwrite(buf, sizeof(buf), 1, resultFile);
-                writeToShm(&shm,buf);
             }
         }
     }
@@ -139,9 +133,11 @@ static int sendFilesToSlave(process* slave, int numFiles, char** files){
         exit(1);
     }
     int result;
-    for (int indexFile = 0, i = 0; indexFile < numFiles; indexFile++){
-        result = write(slave->sendTo, *files, strlen(*files));
-        printf("%s\n", files[i++]);
+    char file[160];
+    for (int indexFile = 0; indexFile < numFiles; indexFile++, files++){
+        strcpy(file, *files);
+        strcat(file, " \n");
+        result = write(slave->sendTo, file, strlen(file));
     }
     slave->remainingTasks = numFiles;
     return result;

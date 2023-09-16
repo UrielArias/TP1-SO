@@ -14,13 +14,16 @@ sharedMem shm;
 
 int main(int argc, char * argv []){
 
-
-    char * nameShm = NAME_SHM;
+    char * nameShm;
     int returnValue; 
     char message[MSG_SIZE];
-    if (argc == 1)
-       read(0,message,4);
 
+    if (argc == 1){
+        read(0,message,7);
+        nameShm = message; 
+    } else 
+        nameShm = argv[1];
+       
     returnValue= openShm(&shm, nameShm);
     if ( returnValue == EXIT_FAIL) {             
         perror("communication couldnt be established, make sure app was initiated");

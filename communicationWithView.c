@@ -8,7 +8,7 @@ void connectWithView(sharedMem * shm){
         perror("shm couldnt be created");
         exit(1);
     }
-    write(1,NAME_SHM,4);
+    write(1,NAME_SHM,7);
 
     sleep(2);
     printf("\nYa no se puede conectar la view\n");
@@ -26,7 +26,7 @@ void writeToShm( sharedMem * shm, char * message ){
     }
 }
 
-void desconnectShm(sharedMem * shm){
+void disconnectShm(sharedMem * shm){
     writeToShm(shm,"x");
     sleep(2);
     int returnValue = closeShm(shm);

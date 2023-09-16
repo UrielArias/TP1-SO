@@ -1,7 +1,9 @@
 #include "communicationAppView.h"
 
+#define NAME_SHM "/shmMd5"
+
 void connectWithView(sharedMem * shm);
 
 void writeToShm( sharedMem * shm, char * message );
 
-void desconnectShm(sharedMem * shm);
+void disconnectShm(sharedMem * shm);

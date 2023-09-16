@@ -25,7 +25,7 @@ int main (int argc, char * argv []) {
     remainingFiles -= numSlaves * filesPerSlave;
     monitorSlaves(slaves, remainingFiles, numSlaves, argv+ numSlaves * filesPerSlave, result, &shm);
     fclose(result);
-    desconnectShm(&shm);
+    disconnectShm(&shm);
 }
 
 

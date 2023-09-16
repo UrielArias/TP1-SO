@@ -1,5 +1,5 @@
 CC= gcc
-CFLAGS= -std=c99 -Wall -pedantic 
+CFLAGS= -Wall -pedantic 
 EXEC = 
 all: md5 slave view
 
@@ -20,10 +20,12 @@ test:
 	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks PVS-Studio.log
 	valgrind --leak-check=full ./md5
 
-cleanAll: cleanView cleanApplication cleanSlave
+cleanAll: cleanView cleanApplication cleanSlave cleanResult
 cleanView:
 	rm -f view
 cleanApplication:
 	rm -f md5 
 cleanSlave:
 	rm -f slave
+cleanResult:
+	rm -f result.txt

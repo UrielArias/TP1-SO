@@ -100,15 +100,24 @@ int deleteShm( sharedMem * shm){
 }
  
 int closeShm( sharedMem * shm){
+    if ( shm == NULL){
+        perror(INVALID_ARGS);
+        return EXIT_FAIL; 
+    }
+    
     int returnValue;
     
-    returnValue = munmap( shm->name , SIZE_SHM);
-    if ( returnValue == EXIT_FAIL)
+    returnValue = munmap( shm->virtualAdress , SIZE_SHM);
+    if ( returnValue == EXIT_FAIL){
+        perror("mun");
         return returnValue;
+    }
 
     returnValue = sem_close( shm->readsAvailable);
-    if ( returnValue == EXIT_FAIL)
+    if ( returnValue == EXIT_FAIL){
+        perror("mun");
         return returnValue;
+    }
     
     return 0;
 }

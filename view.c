@@ -36,7 +36,7 @@ int main(int argc, char * argv []){
     
     //leo la x
     returnValue = readShm(&shm,message,2);
-        if ( returnValue == EXIT_FAILURE) {             
+        if ( returnValue == EXIT_FAIL) {             
             perror("shm couldnt be read");
             closeShm(&shm);
             exit(1);
@@ -44,7 +44,7 @@ int main(int argc, char * argv []){
 
     while(1){
         returnValue = readShm(&shm,message,MSG_SIZE);
-        if ( returnValue == EXIT_FAILURE) {             
+        if ( returnValue == EXIT_FAIL) {             
             perror("shm couldnt be read");
             closeShm(&shm);
             exit(1);
@@ -55,7 +55,7 @@ int main(int argc, char * argv []){
     }
             
     returnValue = closeShm(&shm);
-    if ( returnValue == EXIT_FAILURE) {             
+    if ( returnValue == EXIT_FAIL) {             
         perror("shm couldnt be closed");
         exit(1);
     }

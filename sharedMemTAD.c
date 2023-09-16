@@ -109,13 +109,13 @@ int closeShm( sharedMem * shm){
     
     returnValue = munmap( shm->virtualAdress , SIZE_SHM);
     if ( returnValue == EXIT_FAIL){
-        perror("mun");
+        perror("Couldnt unmap shm");
         return returnValue;
     }
 
     returnValue = sem_close( shm->readsAvailable);
     if ( returnValue == EXIT_FAIL){
-        perror("mun");
+        perror("Couldn close semaphore");
         return returnValue;
     }
     

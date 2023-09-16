@@ -115,7 +115,7 @@ int closeShm( sharedMem * shm){
 
     returnValue = sem_close( shm->readsAvailable);
     if ( returnValue == EXIT_FAIL){
-        perror("Couldn close semaphore");
+        perror("Couldnt close semaphore");
         return returnValue;
     }
     

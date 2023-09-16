@@ -27,9 +27,8 @@ void writeToShm( sharedMem * shm, char * message ){
 }
 
 void desconnectShm(sharedMem * shm){
-
     writeToShm(shm,"Fin de analisis\n");
-
+    sleep(2);
     int returnValue = closeShm(shm);
     if ( returnValue == EXIT_FAILURE) {             
         perror("shm couldnt be closed");

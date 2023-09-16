@@ -42,16 +42,16 @@ int main(int argc, char * argv []){
             exit(1);
         }
 
-    while(message[0]!='F'){
+    while(1){
         returnValue = readShm(&shm,message,MSG_SIZE);
         if ( returnValue == EXIT_FAILURE) {             
             perror("shm couldnt be read");
             closeShm(&shm);
             exit(1);
         }
-        
+        if ( message[0]=='x' )
+            break;
         printf("%s\n",message);
-        
     }
             
     returnValue = closeShm(&shm);

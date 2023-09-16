@@ -6,7 +6,7 @@
 
 
 #define SIZE_SHM 500        // bytes
-#define EXIT_FAILURE 1
+#define EXIT_FAIL -1
 #define INVALID_ARGS "Invalid arguments"
 
 typedef struct shm {

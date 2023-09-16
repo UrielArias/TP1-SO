@@ -22,7 +22,7 @@ int main(int argc, char * argv []){
        read(0,message,4);
 
     returnValue= openShm(&shm, nameShm);
-    if ( returnValue == EXIT_FAILURE) {             
+    if ( returnValue == EXIT_FAIL) {             
         perror("communication couldnt be established, make sure app was initiated");
         exit(1);
     }

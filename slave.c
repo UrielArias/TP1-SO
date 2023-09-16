@@ -16,6 +16,7 @@
     while ((linelen = getline(&path, &linecap, stdin)) > 0) {
         path[linelen-1] = '\0';
         char command[50];
+        char result[160];
         sprintf(command, "md5sum %s", path);
         FILE * fp = popen(command, "r");
 
@@ -27,7 +28,8 @@
             // hay que hacer esto porque el md5 devuelve el hash + el nombre del archivo
             char hash_md5[HASH_LENGTH];
             if (fgets(hash_md5, HASH_LENGTH, fp) != NULL) {
-                printf("File name: %s \nMd5: %s \nSlave's pid: %d \n", path, hash_md5, getpid());
+                sprintf(result, "File name: %s - Md5: %s - Slave's pid: %d \n", path, hash_md5, getpid());
+                write(1, result, strlen(result));
             }
             else {
                 fprintf(stderr, "Error reading MD5 hash for file %s\n", path);

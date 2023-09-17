@@ -1,5 +1,6 @@
 #include "communication.h"
 #include "sharedMemTAD.h"
+#include <string.h>
 
 #define NAME_SHM "/shmMd5"
 

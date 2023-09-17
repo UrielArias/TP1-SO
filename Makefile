@@ -1,5 +1,5 @@
 CC= gcc
-CFLAGS= -Wall -pedantic 
+CFLAGS= -Wall -pedantic -g
 all: md5 slave view
 
 md5: application.c

@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 
-#define SIZE_SHM 500        // bytes
+#define SIZE_SHM 9000        // bytes
 #define EXIT_FAIL -1
 #define INVALID_ARGS "Invalid arguments"
 

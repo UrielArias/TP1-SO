@@ -1,4 +1,4 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MSG_SIZE 100
+#define MSG_SIZE 200

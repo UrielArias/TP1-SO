@@ -8,3 +8,4 @@
 #include "communication.h"
 
 #define HASH_LENGTH 32
+#define PATH_SIZE 60

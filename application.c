@@ -12,6 +12,7 @@ int main (int argc, char * argv []) {
     }
     connectWithView(&shm);
     int remainingFiles = argc - 1;    
+    int filesToAssign;
     int numSlaves = (remainingFiles < MAXSLAVE) ? remainingFiles : MAXSLAVE;
     int filesPerSlave = (remainingFiles < MAXFILESPERSLAVE * MAXSLAVE)? MINFILESPERSLAVE : MAXFILESPERSLAVE;
     FILE * result;
@@ -20,22 +21,21 @@ int main (int argc, char * argv []) {
         exit(EXIT_FAIL);
     }
     process slaves[numSlaves];
-
+    
     createSlaves(numSlaves, slaves);    
     sendInitialLoad(slaves, numSlaves, ++argv, filesPerSlave);
-    remainingFiles -= numSlaves * filesPerSlave;
-    monitorSlaves(slaves, remainingFiles, numSlaves, argv+ numSlaves * filesPerSlave, result, &shm);
+    filesToAssign = remainingFiles -numSlaves * filesPerSlave;
+    monitorSlaves(slaves, remainingFiles, filesToAssign, numSlaves, argv+ numSlaves * filesPerSlave, result, &shm);
     fclose(result);
     disconnectShm(&shm);
 }
 
 
-void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * argv [], FILE * resultFile, sharedMem * shm){
+void monitorSlaves(process* slaves, int remainingFiles, int filesToAssign, int numSlaves, char * argv [], FILE * resultFile, sharedMem * shm){
     fd_set set;
     int filesDone = 0;
-    int filesToAssigned = remainingFiles;
     char buf[MSG_SIZE];
-    while (filesDone <= remainingFiles){
+    while (filesDone < remainingFiles){
         int maxfd, activeFd;
         maxfd = setFdsToCheck(slaves, numSlaves, &set);
         activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
@@ -50,12 +50,12 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
                 char * toWrite = strtok(buf, token);
                 slaves[slave].remainingTasks--;
                 filesDone++;
-                fwrite(toWrite, MSG_SIZE, 1, resultFile);
+                fwrite(toWrite, strlen(toWrite), 1, resultFile);
                 fwrite(token, 1, 1, resultFile);
                 writeToShm(shm, toWrite);
-                if (!slaves[slave].remainingTasks && filesToAssigned > 0){
+                if (!slaves[slave].remainingTasks && filesToAssign > 0){
                     sendFilesToSlave(&slaves[slave], MINFILESPERSLAVE, argv++);
-                    filesToAssigned--;
+                    filesToAssign--;
                 }
                 else if (!slaves[slave].remainingTasks){
                     slaves[slave].isOperative = FALSE;

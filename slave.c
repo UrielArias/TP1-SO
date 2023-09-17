@@ -5,13 +5,14 @@
 
  int main(){
 
-    char * path;
+    char * path = NULL;
     size_t linecap = 0;
     ssize_t linelen;
     char message[MSG_SIZE] = {0};
     while ((linelen = getline(&path, &linecap, stdin)) > 0) {
         path[linelen-1] = '\0';
-        if (strlen(path) > MSG_SIZE - HASH_LENGTH){
+        if (strlen(path) > PATH_SIZE){
+            perror("file name is too long");
             exit(EXIT_FAILURE);
         }
         sprintf(message, "md5sum %s", path);
@@ -32,7 +33,7 @@
                 fprintf(stderr, "Error reading MD5 hash for file %s\n", path);
             }
             pclose(fp);
-        }   
+        }
     }
     free(path);
  }

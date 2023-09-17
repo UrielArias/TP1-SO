@@ -1,14 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#include "communicationAppView.h"
-
-//! falta poner en main de app
-// incluir el define NAME_SHM
-//      conviene ponerlo fuera dl TAD, + prolijo
-// escribe  - una x si ya termino sleep(2)
-//          - una z para indicar fin
-//              hay q darle un tiempito a view para q lea
-//              antes de deleteShm() en app
+#include "communication.h"
+#include "sharedMemTAD.h"
 
 sharedMem shm;
 
@@ -37,7 +30,7 @@ int main(int argc, char * argv []){
     }
 
     
-    //leo la x
+    //the 'x' is read
     returnValue = readShm(&shm,message,2);
         if ( returnValue == EXIT_FAIL) {             
             perror("shm couldnt be read");

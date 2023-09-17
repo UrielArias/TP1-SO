@@ -1,4 +1,5 @@
-#include "communicationAppView.h"
+#include "communication.h"
+#include "sharedMemTAD.h"
 
 #define NAME_SHM "/shmMd5"
 

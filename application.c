@@ -8,15 +8,16 @@ sharedMem shm;
 int main (int argc, char * argv []) {
     if (argc < 2) {
         fprintf(stderr, "No arguments passed. A path to the files is needed\n");
-        exit(1);
+        exit(EXIT_FAIL);
     }
     connectWithView(&shm);
     int remainingFiles = argc - 1;    
     int numSlaves = (remainingFiles < MAXSLAVE) ? remainingFiles : MAXSLAVE;
-    int filesPerSlave = (remainingFiles <= numSlaves || remainingFiles < MAXFILESPERSLAVE * MAXSLAVE)? MINFILESPERSLAVE : MAXFILESPERSLAVE;
+    int filesPerSlave = (remainingFiles < MAXFILESPERSLAVE * MAXSLAVE)? MINFILESPERSLAVE : MAXFILESPERSLAVE;
     FILE * result;
     if( (result = fopen("result.txt", "w")) == NULL ) {
         fprintf(stderr, "Fopen failed");
+        exit(EXIT_FAIL);
     }
     process slaves[numSlaves];
 
@@ -32,10 +33,10 @@ int main (int argc, char * argv []) {
 void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * argv [], FILE * resultFile, sharedMem * shm){
     fd_set set;
     int filesDone = 0;
-    int maxfd, activeFd;
     int filesToAssigned = remainingFiles;
     char buf[MSG_SIZE];
     while (filesDone <= remainingFiles){
+        int maxfd, activeFd;
         maxfd = setFdsToCheck(slaves, numSlaves, &set);
         activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
         if (activeFd == EXIT_FAIL){
@@ -49,11 +50,11 @@ void monitorSlaves(process* slaves, int remainingFiles, int numSlaves, char * ar
                 char * toWrite = strtok(buf, token);
                 slaves[slave].remainingTasks--;
                 filesDone++;
-                fwrite(toWrite, strlen(toWrite), 1, resultFile);
-                fwrite(token, strlen(token), 1, resultFile);
+                fwrite(toWrite, MSG_SIZE, 1, resultFile);
+                fwrite(token, 1, 1, resultFile);
                 writeToShm(shm, toWrite);
                 if (!slaves[slave].remainingTasks && filesToAssigned > 0){
-                    sendFilesToSlave(&slaves[slave], MINFILESPERSLAVE, argv);
+                    sendFilesToSlave(&slaves[slave], MINFILESPERSLAVE, argv++);
                     filesToAssigned--;
                 }
                 else if (!slaves[slave].remainingTasks){

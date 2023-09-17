@@ -9,11 +9,10 @@ void createSlaves(int numSlaves, process* slaveList){
     char * envpFork[] = {NULL};
 
     int pipeFds[FDSPERPIPE * PIPESPERPROC];
-    int returnValue, pid;
     int maxFd = NUMDEFAULTFDS + numSlaves * PIPESPERPROC * FDSPERPIPE;
     int fdsToClose[maxFd - NUMDEFAULTFDS];
     
-    for (int slave = 0, index = 0; slave < numSlaves; slave++){
+    for (int slave = 0, index = 0, returnValue, pid; slave < numSlaves; slave++){
         returnValue = pipe(pipeFds);
         fdsToClose[index++] = pipeFds[WRITEFILEPIPE];
         if (returnValue == -1){
@@ -48,11 +47,11 @@ void createSlaves(int numSlaves, process* slaveList){
 }
 
 int sendInitialLoad(process* slaves, int numSlaves, char ** files, int workload){
-    int ret;
+    int returnValue = 0;
     for (int slave = 0; slave < numSlaves; slave++){
-        ret = sendFilesToSlave(&slaves[slave], workload, &files[slave * workload]);
+        returnValue = sendFilesToSlave(&slaves[slave], workload, &files[slave * workload]);
     } 
-    return ret;
+    return returnValue;
 }
 
 int sendFilesToSlave(process* slave, int numFiles, char** files){

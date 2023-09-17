@@ -8,7 +8,7 @@ void connectWithView(sharedMem * shm){
     returnValue= createShm(shm, NAME_SHM);
     if ( returnValue == EXIT_FAIL ) {             
         perror("shm couldnt be created");
-        exit(1);
+        exit(EXIT_FAIL);
     }
     write(1,NAME_SHM,7);
 
@@ -24,7 +24,7 @@ void writeToShm( sharedMem * shm, char * message ){
         perror("shm couldnt be written");
         closeShm(shm);
         deleteShm(shm);
-        exit(1);
+        exit(EXIT_FAIL);
     }
 }
 
@@ -35,12 +35,12 @@ void disconnectShm(sharedMem * shm){
     if ( returnValue == EXIT_FAIL) {             
         perror("shm couldnt be closed");
         deleteShm(shm);
-        exit(1); 
+        exit(EXIT_FAIL); 
     }
 
     returnValue = deleteShm(shm);
     if ( returnValue == EXIT_FAIL) {             
         perror("shm couldnt be deleted");
-        exit(1);
+        exit(EXIT_FAIL);
     }
 }

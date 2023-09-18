@@ -1,14 +1,14 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "communicationWithView.h"
+#include "errorHandler.h"
 
 void connectWithView(sharedMem * shm){
     int returnValue;
    
     returnValue= createShm(shm, NAME_SHM);
-    if ( returnValue == EXIT_FAIL ) {             
-        perror("shm couldnt be created");
-        exit(EXIT_FAIL);
+    if ( returnValue == EXIT_FAIL ) {    
+        abortError("Shared memory couldn't be created\n");         
     }
     write(1,NAME_SHM,strlen(NAME_SHM));
 
@@ -20,10 +20,9 @@ void connectWithView(sharedMem * shm){
 void writeToShm( sharedMem * shm, char * message ){
     char returnValue =  writeShm(shm, message);
     if ( returnValue == EXIT_FAIL) {             
-        perror("shm couldnt be written");
         closeShm(shm);
         deleteShm(shm);
-        exit(EXIT_FAIL);
+        abortError("Shared memory couldn't be written\n"); 
     }
 }
 
@@ -32,14 +31,12 @@ void disconnectShm(sharedMem * shm){
     sleep(2);
     int returnValue = closeShm(shm);
     if ( returnValue == EXIT_FAIL) {             
-        perror("shm couldnt be closed");
         deleteShm(shm);
-        exit(EXIT_FAIL); 
+        abortError("Shared memory couldn't be closed\n"); 
     }
 
     returnValue = deleteShm(shm);
     if ( returnValue == EXIT_FAIL) {             
-        perror("shm couldnt be deleted");
-        exit(EXIT_FAIL);
+        abortError("Shared memory couldn't be deleted\n"); 
     }
 }

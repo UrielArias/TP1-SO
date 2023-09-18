@@ -7,8 +7,7 @@ sharedMem shm;
 
 int main (int argc, char * argv []) {
     if (argc < 2) {
-        fprintf(stderr, "No arguments passed. A path to the files is needed\n");
-        exit(EXIT_FAIL);
+        abortError("No arguments passed. A path to the files is needed\n");
     }
     connectWithView(&shm);
     int remainingFiles = argc - 1;    
@@ -17,8 +16,7 @@ int main (int argc, char * argv []) {
     int filesPerSlave = (remainingFiles < MAXFILESPERSLAVE * MAXSLAVE)? MINFILESPERSLAVE : MAXFILESPERSLAVE;
     FILE * result;
     if( (result = fopen("result.txt", "w")) == NULL ) {
-        fprintf(stderr, "Fopen failed");
-        exit(EXIT_FAIL);
+        abortError("Fopen failed\n");
     }
     process slaves[numSlaves];
     
@@ -40,8 +38,7 @@ void monitorSlaves(process* slaves, int remainingFiles, int filesToAssign, int n
         maxfd = setFdsToCheck(slaves, numSlaves, &set);
         activeFd = select(maxfd+1, &set, NULL, NULL, NULL);
         if (activeFd == EXIT_FAIL){
-            perror("Select has failed");
-            exit(1);
+            abortError("Select has failed\n");
         }
         for (int slave = 0; activeFd> 0 && slave < numSlaves; slave++){
             if (FD_ISSET(slaves[slave].readFrom, &set)){

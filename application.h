@@ -1,5 +1,6 @@
 #include "communicationWithView.h"
 #include "communicationWithSlaves.h"
+#include "errorHandler.h"
 
 #define MAXSLAVE 5
 #define MAXFILESPERSLAVE 2

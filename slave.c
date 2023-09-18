@@ -12,14 +12,15 @@
     while ((linelen = getline(&path, &linecap, stdin)) > 0) {
         path[linelen-1] = '\0';
         if (strlen(path) > PATH_SIZE){
-            perror("file name is too long");
-            exit(EXIT_FAILURE);
+            abortError("File name is too long\n"); 
         }
         sprintf(message, "md5sum %s", path);
         FILE * fp = popen(message, "r");
 
         if (fp == NULL) {
-            fprintf(stderr, "There has been a problem making the md5 on file %s: %s\n", path, strerror(errno));
+            char msg[PATH_SIZE+50];
+            sprintf(msg, "There has been a problem making the md5 on file %s\n", path);
+            reportError(msg);
         }
         else {
             // Obtengo los primeros 32 caracteres, es decir, el hash, 
@@ -30,7 +31,9 @@
                 write(1, message, MSG_SIZE);
             }
             else {
-                fprintf(stderr, "Error reading MD5 hash for file %s\n", path);
+                char msg[PATH_SIZE+50];
+                sprintf(msg, "Error reading MD5 hash for file %s\n", path);
+                reportError(msg);
             }
             pclose(fp);
         }

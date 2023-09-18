@@ -1,7 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "sharedMemTAD.h"
-
+#include "errorHandler.h"
 
 static int mapMem( sharedMem * shm, int prot, int fd){
     
@@ -87,14 +87,14 @@ int deleteShm( sharedMem * shm){
     }
     
     int returnValue;
+    returnValue = sem_unlink(shm->name);
+    if ( returnValue == EXIT_FAIL)
+        return returnValue;
     
     returnValue = shm_unlink( shm->name);
     if ( returnValue == EXIT_FAIL)
         return returnValue;
 
-    returnValue = sem_unlink(shm->name);
-    if ( returnValue == EXIT_FAIL)
-        return returnValue;
 
     return 0;
 }

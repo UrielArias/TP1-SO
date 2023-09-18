@@ -5,9 +5,7 @@
 #include <unistd.h>
 
 
-#define SIZE_SHM 9000        // bytes
-#define EXIT_FAIL -1
-#define INVALID_ARGS "Invalid arguments"
+#define SIZE_SHM 1048576       // 1MB
 
 typedef struct shm {
     char * name;    

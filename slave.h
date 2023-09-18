@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "communication.h"
+#include "errorHandler.h"
 
 #define HASH_LENGTH 32
 #define PATH_SIZE 60

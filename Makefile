@@ -3,16 +3,16 @@ CFLAGS= -Wall -pedantic -g
 all: md5 slave view
 
 md5: application.c
-	$(CC) $(CFLAGS) -o md5 sharedMemTAD.c communicationWithView.c communicationWithSlaves.c application.c 
+	$(CC) $(CFLAGS) -o md5 sharedMemTAD.c communicationWithView.c communicationWithSlaves.c errorHandler.c application.c 
 
 slave: slave.c
-	$(CC) $(CFLAGS) -o slave slave.c 
+	$(CC) $(CFLAGS) -o slave errorHandler.c slave.c 
 
 view: view.c
-	$(CC) $(CFLAGS) -o view sharedMemTAD.c view.c
+	$(CC) $(CFLAGS) -o view sharedMemTAD.c errorHandler.c view.c
 
 cppcheck: 
-	cppcheck --quiet --enable=all --force --inconclusive .
+	cppcheck --quiet --enable=all --force --suppress=missingIncludeSystem --inconclusive .
 
 pvs-studio:
 	pvs-studio-analyzer trace -- make

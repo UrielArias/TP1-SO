@@ -1,7 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "sharedMemTAD.h"
-#include "errorHandler.h"
 
 static int mapMem( sharedMem * shm, int prot, int fd){
     
@@ -23,7 +22,7 @@ int createShm( sharedMem * shm, char * name){
         return EXIT_FAIL; 
     }
 
-    int fd = shm_open( name,O_CREAT | O_RDWR | O_EXCL , 0666);
+    int fd = shm_open( name,O_CREAT | O_RDWR | O_EXCL , S_IRUSR | S_IWUSR);
     if ( fd==EXIT_FAIL) {             
         perror("shm couldnt be created");
         return EXIT_FAIL;
@@ -41,7 +40,7 @@ int createShm( sharedMem * shm, char * name){
     if ( returnValue == EXIT_FAIL)
         return returnValue;
 
-    shm->readsAvailable = sem_open(name,O_CREAT | O_EXCL | O_RDWR, 0666,0);
+    shm->readsAvailable = sem_open(name,O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR,0);
     if ( shm->readsAvailable == SEM_FAILED){
         perror("Could not create semaphore");
         return EXIT_FAIL;
@@ -58,7 +57,7 @@ int openShm( sharedMem * shm, char * name ){
 
     shm->name = name;    
     
-    int fd = shm_open(name,O_RDONLY, 0666);
+    int fd = shm_open(name,O_RDONLY, S_IRUSR);
     if ( fd == EXIT_FAIL){
         perror("shm couldnt be opened");
         return EXIT_FAIL;

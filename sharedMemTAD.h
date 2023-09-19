@@ -4,8 +4,9 @@
 #include <semaphore.h>
 #include <unistd.h>
 
-
 #define SIZE_SHM 1048576       // 1MB
+#define EXIT_FAIL -1
+#define INVALID_ARGS "Invalid arguments"
 
 typedef struct shm {
     char * name;    

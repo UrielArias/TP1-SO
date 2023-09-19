@@ -1,5 +1,5 @@
 CC= gcc
-CFLAGS= -Wall -pedantic -g
+CFLAGS= -Wall -pedantic
 all: md5 slave view
 
 md5: application.c
@@ -11,20 +11,7 @@ slave: slave.c
 view: view.c
 	$(CC) $(CFLAGS) -o view sharedMemTAD.c errorHandler.c view.c
 
-cppcheck: 
-	cppcheck --quiet --enable=all --force --suppress=missingIncludeSystem --inconclusive .
-
-pvs-studio:
-	pvs-studio-analyzer trace -- make
-	pvs-studio-analyzer analyze
-	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks PVS-Studio.log
-
-valgrind:
-	valgrind --leak-check=full ./md5 ./* | ./view
-
-testAll: cppcheck pvs-studio all valgrind
-
-cleanAll: cleanView cleanApplication cleanSlave cleanResult cleanReports
+cleanAll: cleanView cleanApplication cleanSlave cleanResult 
 cleanView:
 	rm -f view
 cleanApplication:
@@ -33,5 +20,3 @@ cleanSlave:
 	rm -f slave
 cleanResult:
 	rm -f result.txt
-cleanReports:
-	rm -f report.tasks

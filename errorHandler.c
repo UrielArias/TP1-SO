@@ -6,7 +6,3 @@ void abortError (const char * message) {
     perror(message);
     exit(EXIT_FAIL);
 }
-
-void reportError (const char * message) {
-    perror(message);
-}

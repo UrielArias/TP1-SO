@@ -65,9 +65,9 @@ void monitorSlaves(process* slaves, int remainingFiles, int filesToAssign, int n
 }
 
 static int setFdsToCheck(process* slaves, int numSlaves, fd_set * set){
-    FD_ZERO(set); //first step to clear set
+    FD_ZERO(set);
     int fd;
-    int maxFd = EXIT_FAIL; //in case there are no slaves left working it returns -1
+    int maxFd = EXIT_FAIL; 
     for (int slave = 0; slave < numSlaves; slave++){
         if (slaves[slave].isOperative){
             fd = slaves[slave].readFrom;

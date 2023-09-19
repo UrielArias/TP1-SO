@@ -121,8 +121,7 @@ int closeShm( sharedMem * shm){
     return 0;
 }
 
-// it copies to message only one read available
-// it copies till size
+// it copies only one message per read
 int readShm(sharedMem * shm, char * message, int size){
     if ( shm == NULL || message==NULL || size<=0){
         perror(INVALID_ARGS);
@@ -157,8 +156,7 @@ int writeShm(sharedMem * shm, const char * message){
         shm->virtualAdress[shm->offset++] = message[i];
     }                      
 
-    // includes the final 0 
-    // ++ so the final 0 isnt overwritten 
+    // includes the final 0 so the final 0 isnt overwritten 
     shm->virtualAdress[shm->offset++] = message[i];
     
     sem_post(shm->readsAvailable);

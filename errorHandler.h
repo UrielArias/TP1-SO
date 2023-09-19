@@ -5,4 +5,3 @@
 #define INVALID_ARGS "Invalid arguments"
 
 void abortError (const char * message);
-void reportError(const char * message);

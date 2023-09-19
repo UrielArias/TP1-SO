@@ -23,7 +23,7 @@ int main(int argc, char * argv []){
         abortError("Communication couldnt be established, make sure app was initiated\n");        
     }
     
-    // puede acceder? 
+    // ask if it's available to connect
     if ( *shm.virtualAdress=='x'){
         abortError("Buffer cant be accessed, its too late\n");
     }
